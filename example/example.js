@@ -1,18 +1,22 @@
 // for usage with grpc package use endpoint_grpc_pb file
+// import {
+//   QueryServiceClient,
+//   CommandServiceClient
+// } from '../lib/proto/endpoint_pb_service'
 import {
   QueryServiceClient,
   CommandServiceClient
-} from '../lib/proto/endpoint_pb_service'
+} from '../lib/proto/endpoint_grpc_pb'
 import { queryHelper, txHelper } from '../lib'
-
+import grpc from 'grpc'
 import { TxStatus, TxStatusRequest } from '../lib/proto/endpoint_pb.js'
 
 import flow from 'lodash.flow'
 
-let irohaAddress = 'http://localhost:8080'
+let irohaAddress = 'localhost:50051'
 
 let adminPriv =
-  'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70'
+  '0f0ce16d2afbb8eca23c7d8c2724f0c257a800ee2bbd54688cec6b898e3f7e33'
 
 // Creating transaction with txHelper
 let transaction = flow(
@@ -24,7 +28,7 @@ let transaction = flow(
     }),
   t =>
     txHelper.addMeta(t, {
-      creatorAccountId: 'admin@test'
+      creatorAccountId: 'test@notary'
     })
 )(txHelper.emptyTransaction())
 
@@ -37,12 +41,12 @@ let transaction2 = flow(
     }),
   t =>
     txHelper.addMeta(t, {
-      creatorAccountId: 'admin@test'
+      creatorAccountId: 'test@notary'
     })
 )(txHelper.emptyTransaction())
 
 // for usage with grpc package don't forget to pass credentials or grpc.credentials.createInsecure()
-const txClient = new CommandServiceClient(irohaAddress)
+const txClient = new CommandServiceClient(irohaAddress, grpc.credentials.createInsecure())
 
 const batchArray = txHelper.addBatchMeta([transaction, transaction2], 0)
 
@@ -96,8 +100,8 @@ stream2.on('end', function (end) {
 
 // Creating query with queryHelper
 let query = flow(
-  (q) => queryHelper.addQuery(q, 'getAccount', { accountId: 'admin@test' }),
-  (q) => queryHelper.addMeta(q, { creatorAccountId: 'admin@test' }),
+  (q) => queryHelper.addQuery(q, 'getAccount', { accountId: 'test@notary' }),
+  (q) => queryHelper.addMeta(q, { creatorAccountId: 'test@notary' }),
   (q) => queryHelper.sign(q, adminPriv)
 )(queryHelper.emptyQuery())
 
