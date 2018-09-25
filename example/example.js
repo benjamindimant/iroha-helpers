@@ -107,7 +107,8 @@ let query = flow(
 
 // for usage with grpc package don't forget to pass credentials or grpc.credentials.createInsecure()
 const queryClient = new QueryServiceClient(
-  irohaAddress
+  irohaAddress,
+  grpc.credentials.createInsecure()
 )
 
 // Sending query with queryHelper
