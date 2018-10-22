@@ -2,10 +2,10 @@
 // file: endpoint.proto
 
 import * as jspb from "google-protobuf";
-import * as transaction_pb from "./transaction_pb";
+import * as block_pb from "./block_pb";
 import * as queries_pb from "./queries_pb";
-import * as qry_responses_pb from "./qry_responses_pb";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+import * as responses_pb from "./responses_pb";
 
 export class ToriiResponse extends jspb.Message {
   getTxStatus(): TxStatus;
@@ -59,38 +59,13 @@ export namespace TxStatusRequest {
   }
 }
 
-export class TxList extends jspb.Message {
-  clearTransactionsList(): void;
-  getTransactionsList(): Array<transaction_pb.Transaction>;
-  setTransactionsList(value: Array<transaction_pb.Transaction>): void;
-  addTransactions(value?: transaction_pb.Transaction, index?: number): transaction_pb.Transaction;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): TxList.AsObject;
-  static toObject(includeInstance: boolean, msg: TxList): TxList.AsObject;
-  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: TxList, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): TxList;
-  static deserializeBinaryFromReader(message: TxList, reader: jspb.BinaryReader): TxList;
-}
-
-export namespace TxList {
-  export type AsObject = {
-    transactionsList: Array<transaction_pb.Transaction.AsObject>,
-  }
-}
-
 export enum TxStatus {
   STATELESS_VALIDATION_FAILED = 0,
   STATELESS_VALIDATION_SUCCESS = 1,
   STATEFUL_VALIDATION_FAILED = 2,
   STATEFUL_VALIDATION_SUCCESS = 3,
-  REJECTED = 4,
-  COMMITTED = 5,
-  MST_EXPIRED = 6,
-  NOT_RECEIVED = 7,
-  MST_PENDING = 8,
-  ENOUGH_SIGNATURES_COLLECTED = 9,
+  COMMITTED = 4,
+  MST_EXPIRED = 5,
+  NOT_RECEIVED = 6,
 }
 

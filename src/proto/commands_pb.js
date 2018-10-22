@@ -76,8 +76,9 @@ proto.iroha.protocol.AddAssetQuantity.prototype.toObject = function(opt_includeI
  */
 proto.iroha.protocol.AddAssetQuantity.toObject = function(includeInstance, msg) {
   var f, obj = {
-    assetId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    amount: jspb.Message.getFieldWithDefault(msg, 2, "")
+    accountId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    assetId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    amount: (f = msg.getAmount()) && primitive_pb.Amount.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -116,10 +117,15 @@ proto.iroha.protocol.AddAssetQuantity.deserializeBinaryFromReader = function(msg
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setAssetId(value);
+      msg.setAccountId(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
+      msg.setAssetId(value);
+      break;
+    case 3:
+      var value = new primitive_pb.Amount;
+      reader.readMessage(value,primitive_pb.Amount.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -151,50 +157,88 @@ proto.iroha.protocol.AddAssetQuantity.prototype.serializeBinary = function() {
  */
 proto.iroha.protocol.AddAssetQuantity.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getAssetId();
+  f = message.getAccountId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getAmount();
+  f = message.getAssetId();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
+  f = message.getAmount();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      primitive_pb.Amount.serializeBinaryToWriter
+    );
+  }
 };
 
 
 /**
- * optional string asset_id = 1;
+ * optional string account_id = 1;
  * @return {string}
  */
-proto.iroha.protocol.AddAssetQuantity.prototype.getAssetId = function() {
+proto.iroha.protocol.AddAssetQuantity.prototype.getAccountId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.iroha.protocol.AddAssetQuantity.prototype.setAssetId = function(value) {
+proto.iroha.protocol.AddAssetQuantity.prototype.setAccountId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional string amount = 2;
+ * optional string asset_id = 2;
  * @return {string}
  */
-proto.iroha.protocol.AddAssetQuantity.prototype.getAmount = function() {
+proto.iroha.protocol.AddAssetQuantity.prototype.getAssetId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.iroha.protocol.AddAssetQuantity.prototype.setAmount = function(value) {
+proto.iroha.protocol.AddAssetQuantity.prototype.setAssetId = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional Amount amount = 3;
+ * @return {?proto.iroha.protocol.Amount}
+ */
+proto.iroha.protocol.AddAssetQuantity.prototype.getAmount = function() {
+  return /** @type{?proto.iroha.protocol.Amount} */ (
+    jspb.Message.getWrapperField(this, primitive_pb.Amount, 3));
+};
+
+
+/** @param {?proto.iroha.protocol.Amount|undefined} value */
+proto.iroha.protocol.AddAssetQuantity.prototype.setAmount = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+proto.iroha.protocol.AddAssetQuantity.prototype.clearAmount = function() {
+  this.setAmount(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.iroha.protocol.AddAssetQuantity.prototype.hasAmount = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
@@ -795,7 +839,7 @@ proto.iroha.protocol.CreateAccount.toObject = function(includeInstance, msg) {
   var f, obj = {
     accountName: jspb.Message.getFieldWithDefault(msg, 1, ""),
     domainId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    publicKey: msg.getPublicKey_asB64()
+    mainPubkey: msg.getMainPubkey_asB64()
   };
 
   if (includeInstance) {
@@ -842,7 +886,7 @@ proto.iroha.protocol.CreateAccount.deserializeBinaryFromReader = function(msg, r
       break;
     case 3:
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setPublicKey(value);
+      msg.setMainPubkey(value);
       break;
     default:
       reader.skipField();
@@ -887,7 +931,7 @@ proto.iroha.protocol.CreateAccount.serializeBinaryToWriter = function(message, w
       f
     );
   }
-  f = message.getPublicKey_asU8();
+  f = message.getMainPubkey_asU8();
   if (f.length > 0) {
     writer.writeBytes(
       3,
@@ -928,40 +972,40 @@ proto.iroha.protocol.CreateAccount.prototype.setDomainId = function(value) {
 
 
 /**
- * optional bytes public_key = 3;
+ * optional bytes main_pubkey = 3;
  * @return {!(string|Uint8Array)}
  */
-proto.iroha.protocol.CreateAccount.prototype.getPublicKey = function() {
+proto.iroha.protocol.CreateAccount.prototype.getMainPubkey = function() {
   return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /**
- * optional bytes public_key = 3;
- * This is a type-conversion wrapper around `getPublicKey()`
+ * optional bytes main_pubkey = 3;
+ * This is a type-conversion wrapper around `getMainPubkey()`
  * @return {string}
  */
-proto.iroha.protocol.CreateAccount.prototype.getPublicKey_asB64 = function() {
+proto.iroha.protocol.CreateAccount.prototype.getMainPubkey_asB64 = function() {
   return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getPublicKey()));
+      this.getMainPubkey()));
 };
 
 
 /**
- * optional bytes public_key = 3;
+ * optional bytes main_pubkey = 3;
  * Note that Uint8Array is not supported on all browsers.
  * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getPublicKey()`
+ * This is a type-conversion wrapper around `getMainPubkey()`
  * @return {!Uint8Array}
  */
-proto.iroha.protocol.CreateAccount.prototype.getPublicKey_asU8 = function() {
+proto.iroha.protocol.CreateAccount.prototype.getMainPubkey_asU8 = function() {
   return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getPublicKey()));
+      this.getMainPubkey()));
 };
 
 
 /** @param {!(string|Uint8Array)} value */
-proto.iroha.protocol.CreateAccount.prototype.setPublicKey = function(value) {
+proto.iroha.protocol.CreateAccount.prototype.setMainPubkey = function(value) {
   jspb.Message.setProto3BytesField(this, 3, value);
 };
 
@@ -1744,7 +1788,7 @@ proto.iroha.protocol.TransferAsset.toObject = function(includeInstance, msg) {
     destAccountId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     assetId: jspb.Message.getFieldWithDefault(msg, 3, ""),
     description: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    amount: jspb.Message.getFieldWithDefault(msg, 5, "")
+    amount: (f = msg.getAmount()) && primitive_pb.Amount.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1798,7 +1842,8 @@ proto.iroha.protocol.TransferAsset.deserializeBinaryFromReader = function(msg, r
       msg.setDescription(value);
       break;
     case 5:
-      var value = /** @type {string} */ (reader.readString());
+      var value = new primitive_pb.Amount;
+      reader.readMessage(value,primitive_pb.Amount.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -1859,10 +1904,11 @@ proto.iroha.protocol.TransferAsset.serializeBinaryToWriter = function(message, w
     );
   }
   f = message.getAmount();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f != null) {
+    writer.writeMessage(
       5,
-      f
+      f,
+      primitive_pb.Amount.serializeBinaryToWriter
     );
   }
 };
@@ -1929,17 +1975,32 @@ proto.iroha.protocol.TransferAsset.prototype.setDescription = function(value) {
 
 
 /**
- * optional string amount = 5;
- * @return {string}
+ * optional Amount amount = 5;
+ * @return {?proto.iroha.protocol.Amount}
  */
 proto.iroha.protocol.TransferAsset.prototype.getAmount = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type{?proto.iroha.protocol.Amount} */ (
+    jspb.Message.getWrapperField(this, primitive_pb.Amount, 5));
 };
 
 
-/** @param {string} value */
+/** @param {?proto.iroha.protocol.Amount|undefined} value */
 proto.iroha.protocol.TransferAsset.prototype.setAmount = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+proto.iroha.protocol.TransferAsset.prototype.clearAmount = function() {
+  this.setAmount(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.iroha.protocol.TransferAsset.prototype.hasAmount = function() {
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
@@ -2856,8 +2917,9 @@ proto.iroha.protocol.SubtractAssetQuantity.prototype.toObject = function(opt_inc
  */
 proto.iroha.protocol.SubtractAssetQuantity.toObject = function(includeInstance, msg) {
   var f, obj = {
-    assetId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    amount: jspb.Message.getFieldWithDefault(msg, 2, "")
+    accountId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    assetId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    amount: (f = msg.getAmount()) && primitive_pb.Amount.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2896,10 +2958,15 @@ proto.iroha.protocol.SubtractAssetQuantity.deserializeBinaryFromReader = functio
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setAssetId(value);
+      msg.setAccountId(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
+      msg.setAssetId(value);
+      break;
+    case 3:
+      var value = new primitive_pb.Amount;
+      reader.readMessage(value,primitive_pb.Amount.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -2931,50 +2998,88 @@ proto.iroha.protocol.SubtractAssetQuantity.prototype.serializeBinary = function(
  */
 proto.iroha.protocol.SubtractAssetQuantity.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getAssetId();
+  f = message.getAccountId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getAmount();
+  f = message.getAssetId();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
+  f = message.getAmount();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      primitive_pb.Amount.serializeBinaryToWriter
+    );
+  }
 };
 
 
 /**
- * optional string asset_id = 1;
+ * optional string account_id = 1;
  * @return {string}
  */
-proto.iroha.protocol.SubtractAssetQuantity.prototype.getAssetId = function() {
+proto.iroha.protocol.SubtractAssetQuantity.prototype.getAccountId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.iroha.protocol.SubtractAssetQuantity.prototype.setAssetId = function(value) {
+proto.iroha.protocol.SubtractAssetQuantity.prototype.setAccountId = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional string amount = 2;
+ * optional string asset_id = 2;
  * @return {string}
  */
-proto.iroha.protocol.SubtractAssetQuantity.prototype.getAmount = function() {
+proto.iroha.protocol.SubtractAssetQuantity.prototype.getAssetId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.iroha.protocol.SubtractAssetQuantity.prototype.setAmount = function(value) {
+proto.iroha.protocol.SubtractAssetQuantity.prototype.setAssetId = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional Amount amount = 3;
+ * @return {?proto.iroha.protocol.Amount}
+ */
+proto.iroha.protocol.SubtractAssetQuantity.prototype.getAmount = function() {
+  return /** @type{?proto.iroha.protocol.Amount} */ (
+    jspb.Message.getWrapperField(this, primitive_pb.Amount, 3));
+};
+
+
+/** @param {?proto.iroha.protocol.Amount|undefined} value */
+proto.iroha.protocol.SubtractAssetQuantity.prototype.setAmount = function(value) {
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+proto.iroha.protocol.SubtractAssetQuantity.prototype.clearAmount = function() {
+  this.setAmount(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.iroha.protocol.SubtractAssetQuantity.prototype.hasAmount = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
@@ -3021,10 +3126,10 @@ proto.iroha.protocol.Command.CommandCase = {
   CREATE_ROLE: 8,
   DETACH_ROLE: 9,
   GRANT_PERMISSION: 10,
-  REMOVE_SIGNATORY: 11,
+  REMOVE_SIGN: 11,
   REVOKE_PERMISSION: 12,
   SET_ACCOUNT_DETAIL: 13,
-  SET_ACCOUNT_QUORUM: 14,
+  SET_QUORUM: 14,
   SUBTRACT_ASSET_QUANTITY: 15,
   TRANSFER_ASSET: 16
 };
@@ -3075,10 +3180,10 @@ proto.iroha.protocol.Command.toObject = function(includeInstance, msg) {
     createRole: (f = msg.getCreateRole()) && proto.iroha.protocol.CreateRole.toObject(includeInstance, f),
     detachRole: (f = msg.getDetachRole()) && proto.iroha.protocol.DetachRole.toObject(includeInstance, f),
     grantPermission: (f = msg.getGrantPermission()) && proto.iroha.protocol.GrantPermission.toObject(includeInstance, f),
-    removeSignatory: (f = msg.getRemoveSignatory()) && proto.iroha.protocol.RemoveSignatory.toObject(includeInstance, f),
+    removeSign: (f = msg.getRemoveSign()) && proto.iroha.protocol.RemoveSignatory.toObject(includeInstance, f),
     revokePermission: (f = msg.getRevokePermission()) && proto.iroha.protocol.RevokePermission.toObject(includeInstance, f),
     setAccountDetail: (f = msg.getSetAccountDetail()) && proto.iroha.protocol.SetAccountDetail.toObject(includeInstance, f),
-    setAccountQuorum: (f = msg.getSetAccountQuorum()) && proto.iroha.protocol.SetAccountQuorum.toObject(includeInstance, f),
+    setQuorum: (f = msg.getSetQuorum()) && proto.iroha.protocol.SetAccountQuorum.toObject(includeInstance, f),
     subtractAssetQuantity: (f = msg.getSubtractAssetQuantity()) && proto.iroha.protocol.SubtractAssetQuantity.toObject(includeInstance, f),
     transferAsset: (f = msg.getTransferAsset()) && proto.iroha.protocol.TransferAsset.toObject(includeInstance, f)
   };
@@ -3170,7 +3275,7 @@ proto.iroha.protocol.Command.deserializeBinaryFromReader = function(msg, reader)
     case 11:
       var value = new proto.iroha.protocol.RemoveSignatory;
       reader.readMessage(value,proto.iroha.protocol.RemoveSignatory.deserializeBinaryFromReader);
-      msg.setRemoveSignatory(value);
+      msg.setRemoveSign(value);
       break;
     case 12:
       var value = new proto.iroha.protocol.RevokePermission;
@@ -3185,7 +3290,7 @@ proto.iroha.protocol.Command.deserializeBinaryFromReader = function(msg, reader)
     case 14:
       var value = new proto.iroha.protocol.SetAccountQuorum;
       reader.readMessage(value,proto.iroha.protocol.SetAccountQuorum.deserializeBinaryFromReader);
-      msg.setSetAccountQuorum(value);
+      msg.setSetQuorum(value);
       break;
     case 15:
       var value = new proto.iroha.protocol.SubtractAssetQuantity;
@@ -3306,7 +3411,7 @@ proto.iroha.protocol.Command.serializeBinaryToWriter = function(message, writer)
       proto.iroha.protocol.GrantPermission.serializeBinaryToWriter
     );
   }
-  f = message.getRemoveSignatory();
+  f = message.getRemoveSign();
   if (f != null) {
     writer.writeMessage(
       11,
@@ -3330,7 +3435,7 @@ proto.iroha.protocol.Command.serializeBinaryToWriter = function(message, writer)
       proto.iroha.protocol.SetAccountDetail.serializeBinaryToWriter
     );
   }
-  f = message.getSetAccountQuorum();
+  f = message.getSetQuorum();
   if (f != null) {
     writer.writeMessage(
       14,
@@ -3658,23 +3763,23 @@ proto.iroha.protocol.Command.prototype.hasGrantPermission = function() {
 
 
 /**
- * optional RemoveSignatory remove_signatory = 11;
+ * optional RemoveSignatory remove_sign = 11;
  * @return {?proto.iroha.protocol.RemoveSignatory}
  */
-proto.iroha.protocol.Command.prototype.getRemoveSignatory = function() {
+proto.iroha.protocol.Command.prototype.getRemoveSign = function() {
   return /** @type{?proto.iroha.protocol.RemoveSignatory} */ (
     jspb.Message.getWrapperField(this, proto.iroha.protocol.RemoveSignatory, 11));
 };
 
 
 /** @param {?proto.iroha.protocol.RemoveSignatory|undefined} value */
-proto.iroha.protocol.Command.prototype.setRemoveSignatory = function(value) {
+proto.iroha.protocol.Command.prototype.setRemoveSign = function(value) {
   jspb.Message.setOneofWrapperField(this, 11, proto.iroha.protocol.Command.oneofGroups_[0], value);
 };
 
 
-proto.iroha.protocol.Command.prototype.clearRemoveSignatory = function() {
-  this.setRemoveSignatory(undefined);
+proto.iroha.protocol.Command.prototype.clearRemoveSign = function() {
+  this.setRemoveSign(undefined);
 };
 
 
@@ -3682,7 +3787,7 @@ proto.iroha.protocol.Command.prototype.clearRemoveSignatory = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.iroha.protocol.Command.prototype.hasRemoveSignatory = function() {
+proto.iroha.protocol.Command.prototype.hasRemoveSign = function() {
   return jspb.Message.getField(this, 11) != null;
 };
 
@@ -3748,23 +3853,23 @@ proto.iroha.protocol.Command.prototype.hasSetAccountDetail = function() {
 
 
 /**
- * optional SetAccountQuorum set_account_quorum = 14;
+ * optional SetAccountQuorum set_quorum = 14;
  * @return {?proto.iroha.protocol.SetAccountQuorum}
  */
-proto.iroha.protocol.Command.prototype.getSetAccountQuorum = function() {
+proto.iroha.protocol.Command.prototype.getSetQuorum = function() {
   return /** @type{?proto.iroha.protocol.SetAccountQuorum} */ (
     jspb.Message.getWrapperField(this, proto.iroha.protocol.SetAccountQuorum, 14));
 };
 
 
 /** @param {?proto.iroha.protocol.SetAccountQuorum|undefined} value */
-proto.iroha.protocol.Command.prototype.setSetAccountQuorum = function(value) {
+proto.iroha.protocol.Command.prototype.setSetQuorum = function(value) {
   jspb.Message.setOneofWrapperField(this, 14, proto.iroha.protocol.Command.oneofGroups_[0], value);
 };
 
 
-proto.iroha.protocol.Command.prototype.clearSetAccountQuorum = function() {
-  this.setSetAccountQuorum(undefined);
+proto.iroha.protocol.Command.prototype.clearSetQuorum = function() {
+  this.setSetQuorum(undefined);
 };
 
 
@@ -3772,7 +3877,7 @@ proto.iroha.protocol.Command.prototype.clearSetAccountQuorum = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.iroha.protocol.Command.prototype.hasSetAccountQuorum = function() {
+proto.iroha.protocol.Command.prototype.hasSetQuorum = function() {
   return jspb.Message.getField(this, 14) != null;
 };
 

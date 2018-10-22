@@ -1,9 +1,8 @@
 // package: iroha.protocol
-// file: qry_responses.proto
+// file: responses.proto
 
 import * as jspb from "google-protobuf";
 import * as block_pb from "./block_pb";
-import * as transaction_pb from "./transaction_pb";
 import * as primitive_pb from "./primitive_pb";
 
 export class Asset extends jspb.Message {
@@ -97,8 +96,10 @@ export class AccountAsset extends jspb.Message {
   getAccountId(): string;
   setAccountId(value: string): void;
 
-  getBalance(): string;
-  setBalance(value: string): void;
+  hasBalance(): boolean;
+  clearBalance(): void;
+  getBalance(): primitive_pb.Amount | undefined;
+  setBalance(value?: primitive_pb.Amount): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AccountAsset.AsObject;
@@ -114,7 +115,7 @@ export namespace AccountAsset {
   export type AsObject = {
     assetId: string,
     accountId: string,
-    balance: string,
+    balance?: primitive_pb.Amount.AsObject,
   }
 }
 
@@ -234,9 +235,9 @@ export namespace RolesResponse {
 
 export class RolePermissionsResponse extends jspb.Message {
   clearPermissionsList(): void;
-  getPermissionsList(): Array<primitive_pb.RolePermission>;
-  setPermissionsList(value: Array<primitive_pb.RolePermission>): void;
-  addPermissions(value: primitive_pb.RolePermission, index?: number): primitive_pb.RolePermission;
+  getPermissionsList(): Array<string>;
+  setPermissionsList(value: Array<string>): void;
+  addPermissions(value: string, index?: number): string;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RolePermissionsResponse.AsObject;
@@ -250,7 +251,7 @@ export class RolePermissionsResponse extends jspb.Message {
 
 export namespace RolePermissionsResponse {
   export type AsObject = {
-    permissionsList: Array<primitive_pb.RolePermission>,
+    permissionsList: Array<string>,
   }
 }
 
@@ -316,9 +317,9 @@ export namespace SignatoriesResponse {
 
 export class TransactionsResponse extends jspb.Message {
   clearTransactionsList(): void;
-  getTransactionsList(): Array<transaction_pb.Transaction>;
-  setTransactionsList(value: Array<transaction_pb.Transaction>): void;
-  addTransactions(value?: transaction_pb.Transaction, index?: number): transaction_pb.Transaction;
+  getTransactionsList(): Array<block_pb.Transaction>;
+  setTransactionsList(value: Array<block_pb.Transaction>): void;
+  addTransactions(value?: block_pb.Transaction, index?: number): block_pb.Transaction;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TransactionsResponse.AsObject;
@@ -332,7 +333,7 @@ export class TransactionsResponse extends jspb.Message {
 
 export namespace TransactionsResponse {
   export type AsObject = {
-    transactionsList: Array<transaction_pb.Transaction.AsObject>,
+    transactionsList: Array<block_pb.Transaction.AsObject>,
   }
 }
 
@@ -472,10 +473,10 @@ export class BlockQueryResponse extends jspb.Message {
   getBlockResponse(): BlockResponse | undefined;
   setBlockResponse(value?: BlockResponse): void;
 
-  hasBlockErrorResponse(): boolean;
-  clearBlockErrorResponse(): void;
-  getBlockErrorResponse(): BlockErrorResponse | undefined;
-  setBlockErrorResponse(value?: BlockErrorResponse): void;
+  hasErrorResponse(): boolean;
+  clearErrorResponse(): void;
+  getErrorResponse(): BlockErrorResponse | undefined;
+  setErrorResponse(value?: BlockErrorResponse): void;
 
   getResponseCase(): BlockQueryResponse.ResponseCase;
   serializeBinary(): Uint8Array;
@@ -491,13 +492,13 @@ export class BlockQueryResponse extends jspb.Message {
 export namespace BlockQueryResponse {
   export type AsObject = {
     blockResponse?: BlockResponse.AsObject,
-    blockErrorResponse?: BlockErrorResponse.AsObject,
+    errorResponse?: BlockErrorResponse.AsObject,
   }
 
   export enum ResponseCase {
     RESPONSE_NOT_SET = 0,
     BLOCK_RESPONSE = 1,
-    BLOCK_ERROR_RESPONSE = 2,
+    ERROR_RESPONSE = 2,
   }
 }
 

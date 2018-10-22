@@ -2,16 +2,16 @@
 // file: proposal.proto
 
 import * as jspb from "google-protobuf";
-import * as transaction_pb from "./transaction_pb";
+import * as block_pb from "./block_pb";
 
 export class Proposal extends jspb.Message {
   getHeight(): number;
   setHeight(value: number): void;
 
   clearTransactionsList(): void;
-  getTransactionsList(): Array<transaction_pb.Transaction>;
-  setTransactionsList(value: Array<transaction_pb.Transaction>): void;
-  addTransactions(value?: transaction_pb.Transaction, index?: number): transaction_pb.Transaction;
+  getTransactionsList(): Array<block_pb.Transaction>;
+  setTransactionsList(value: Array<block_pb.Transaction>): void;
+  addTransactions(value?: block_pb.Transaction, index?: number): block_pb.Transaction;
 
   getCreatedTime(): number;
   setCreatedTime(value: number): void;
@@ -29,7 +29,7 @@ export class Proposal extends jspb.Message {
 export namespace Proposal {
   export type AsObject = {
     height: number,
-    transactionsList: Array<transaction_pb.Transaction.AsObject>,
+    transactionsList: Array<block_pb.Transaction.AsObject>,
     createdTime: number,
   }
 }

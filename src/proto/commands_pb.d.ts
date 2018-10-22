@@ -5,11 +5,16 @@ import * as jspb from "google-protobuf";
 import * as primitive_pb from "./primitive_pb";
 
 export class AddAssetQuantity extends jspb.Message {
+  getAccountId(): string;
+  setAccountId(value: string): void;
+
   getAssetId(): string;
   setAssetId(value: string): void;
 
-  getAmount(): string;
-  setAmount(value: string): void;
+  hasAmount(): boolean;
+  clearAmount(): void;
+  getAmount(): primitive_pb.Amount | undefined;
+  setAmount(value?: primitive_pb.Amount): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AddAssetQuantity.AsObject;
@@ -23,8 +28,9 @@ export class AddAssetQuantity extends jspb.Message {
 
 export namespace AddAssetQuantity {
   export type AsObject = {
+    accountId: string,
     assetId: string,
-    amount: string,
+    amount?: primitive_pb.Amount.AsObject,
   }
 }
 
@@ -111,10 +117,10 @@ export class CreateAccount extends jspb.Message {
   getDomainId(): string;
   setDomainId(value: string): void;
 
-  getPublicKey(): Uint8Array | string;
-  getPublicKey_asU8(): Uint8Array;
-  getPublicKey_asB64(): string;
-  setPublicKey(value: Uint8Array | string): void;
+  getMainPubkey(): Uint8Array | string;
+  getMainPubkey_asU8(): Uint8Array;
+  getMainPubkey_asB64(): string;
+  setMainPubkey(value: Uint8Array | string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateAccount.AsObject;
@@ -130,7 +136,7 @@ export namespace CreateAccount {
   export type AsObject = {
     accountName: string,
     domainId: string,
-    publicKey: Uint8Array | string,
+    mainPubkey: Uint8Array | string,
   }
 }
 
@@ -249,8 +255,10 @@ export class TransferAsset extends jspb.Message {
   getDescription(): string;
   setDescription(value: string): void;
 
-  getAmount(): string;
-  setAmount(value: string): void;
+  hasAmount(): boolean;
+  clearAmount(): void;
+  getAmount(): primitive_pb.Amount | undefined;
+  setAmount(value?: primitive_pb.Amount): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TransferAsset.AsObject;
@@ -268,7 +276,7 @@ export namespace TransferAsset {
     destAccountId: string,
     assetId: string,
     description: string,
-    amount: string,
+    amount?: primitive_pb.Amount.AsObject,
   }
 }
 
@@ -395,11 +403,16 @@ export namespace RevokePermission {
 }
 
 export class SubtractAssetQuantity extends jspb.Message {
+  getAccountId(): string;
+  setAccountId(value: string): void;
+
   getAssetId(): string;
   setAssetId(value: string): void;
 
-  getAmount(): string;
-  setAmount(value: string): void;
+  hasAmount(): boolean;
+  clearAmount(): void;
+  getAmount(): primitive_pb.Amount | undefined;
+  setAmount(value?: primitive_pb.Amount): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SubtractAssetQuantity.AsObject;
@@ -413,8 +426,9 @@ export class SubtractAssetQuantity extends jspb.Message {
 
 export namespace SubtractAssetQuantity {
   export type AsObject = {
+    accountId: string,
     assetId: string,
-    amount: string,
+    amount?: primitive_pb.Amount.AsObject,
   }
 }
 
@@ -469,10 +483,10 @@ export class Command extends jspb.Message {
   getGrantPermission(): GrantPermission | undefined;
   setGrantPermission(value?: GrantPermission): void;
 
-  hasRemoveSignatory(): boolean;
-  clearRemoveSignatory(): void;
-  getRemoveSignatory(): RemoveSignatory | undefined;
-  setRemoveSignatory(value?: RemoveSignatory): void;
+  hasRemoveSign(): boolean;
+  clearRemoveSign(): void;
+  getRemoveSign(): RemoveSignatory | undefined;
+  setRemoveSign(value?: RemoveSignatory): void;
 
   hasRevokePermission(): boolean;
   clearRevokePermission(): void;
@@ -484,10 +498,10 @@ export class Command extends jspb.Message {
   getSetAccountDetail(): SetAccountDetail | undefined;
   setSetAccountDetail(value?: SetAccountDetail): void;
 
-  hasSetAccountQuorum(): boolean;
-  clearSetAccountQuorum(): void;
-  getSetAccountQuorum(): SetAccountQuorum | undefined;
-  setSetAccountQuorum(value?: SetAccountQuorum): void;
+  hasSetQuorum(): boolean;
+  clearSetQuorum(): void;
+  getSetQuorum(): SetAccountQuorum | undefined;
+  setSetQuorum(value?: SetAccountQuorum): void;
 
   hasSubtractAssetQuantity(): boolean;
   clearSubtractAssetQuantity(): void;
@@ -522,10 +536,10 @@ export namespace Command {
     createRole?: CreateRole.AsObject,
     detachRole?: DetachRole.AsObject,
     grantPermission?: GrantPermission.AsObject,
-    removeSignatory?: RemoveSignatory.AsObject,
+    removeSign?: RemoveSignatory.AsObject,
     revokePermission?: RevokePermission.AsObject,
     setAccountDetail?: SetAccountDetail.AsObject,
-    setAccountQuorum?: SetAccountQuorum.AsObject,
+    setQuorum?: SetAccountQuorum.AsObject,
     subtractAssetQuantity?: SubtractAssetQuantity.AsObject,
     transferAsset?: TransferAsset.AsObject,
   }
@@ -542,10 +556,10 @@ export namespace Command {
     CREATE_ROLE = 8,
     DETACH_ROLE = 9,
     GRANT_PERMISSION = 10,
-    REMOVE_SIGNATORY = 11,
+    REMOVE_SIGN = 11,
     REVOKE_PERMISSION = 12,
     SET_ACCOUNT_DETAIL = 13,
-    SET_ACCOUNT_QUORUM = 14,
+    SET_QUORUM = 14,
     SUBTRACT_ASSET_QUANTITY = 15,
     TRANSFER_ASSET = 16,
   }

@@ -12,7 +12,6 @@ var goog = jspb;
 var global = Function('return this')();
 
 var block_pb = require('./block_pb.js');
-var transaction_pb = require('./transaction_pb.js');
 var primitive_pb = require('./primitive_pb.js');
 goog.exportSymbol('proto.iroha.protocol.Account', null, global);
 goog.exportSymbol('proto.iroha.protocol.AccountAsset', null, global);
@@ -669,7 +668,7 @@ proto.iroha.protocol.AccountAsset.toObject = function(includeInstance, msg) {
   var f, obj = {
     assetId: jspb.Message.getFieldWithDefault(msg, 1, ""),
     accountId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    balance: jspb.Message.getFieldWithDefault(msg, 3, "")
+    balance: (f = msg.getBalance()) && primitive_pb.Amount.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -715,7 +714,8 @@ proto.iroha.protocol.AccountAsset.deserializeBinaryFromReader = function(msg, re
       msg.setAccountId(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
+      var value = new primitive_pb.Amount;
+      reader.readMessage(value,primitive_pb.Amount.deserializeBinaryFromReader);
       msg.setBalance(value);
       break;
     default:
@@ -762,10 +762,11 @@ proto.iroha.protocol.AccountAsset.serializeBinaryToWriter = function(message, wr
     );
   }
   f = message.getBalance();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f != null) {
+    writer.writeMessage(
       3,
-      f
+      f,
+      primitive_pb.Amount.serializeBinaryToWriter
     );
   }
 };
@@ -802,17 +803,32 @@ proto.iroha.protocol.AccountAsset.prototype.setAccountId = function(value) {
 
 
 /**
- * optional string balance = 3;
- * @return {string}
+ * optional Amount balance = 3;
+ * @return {?proto.iroha.protocol.Amount}
  */
 proto.iroha.protocol.AccountAsset.prototype.getBalance = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type{?proto.iroha.protocol.Amount} */ (
+    jspb.Message.getWrapperField(this, primitive_pb.Amount, 3));
 };
 
 
-/** @param {string} value */
+/** @param {?proto.iroha.protocol.Amount|undefined} value */
 proto.iroha.protocol.AccountAsset.prototype.setBalance = function(value) {
-  jspb.Message.setProto3StringField(this, 3, value);
+  jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+proto.iroha.protocol.AccountAsset.prototype.clearBalance = function() {
+  this.setBalance(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.iroha.protocol.AccountAsset.prototype.hasBalance = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
@@ -1747,8 +1763,8 @@ proto.iroha.protocol.RolePermissionsResponse.deserializeBinaryFromReader = funct
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Array.<!proto.iroha.protocol.RolePermission>} */ (reader.readPackedEnum());
-      msg.setPermissionsList(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.addPermissions(value);
       break;
     default:
       reader.skipField();
@@ -1781,7 +1797,7 @@ proto.iroha.protocol.RolePermissionsResponse.serializeBinaryToWriter = function(
   var f = undefined;
   f = message.getPermissionsList();
   if (f.length > 0) {
-    writer.writePackedEnum(
+    writer.writeRepeatedString(
       1,
       f
     );
@@ -1790,22 +1806,22 @@ proto.iroha.protocol.RolePermissionsResponse.serializeBinaryToWriter = function(
 
 
 /**
- * repeated RolePermission permissions = 1;
- * @return {!Array.<!proto.iroha.protocol.RolePermission>}
+ * repeated string permissions = 1;
+ * @return {!Array.<string>}
  */
 proto.iroha.protocol.RolePermissionsResponse.prototype.getPermissionsList = function() {
-  return /** @type {!Array.<!proto.iroha.protocol.RolePermission>} */ (jspb.Message.getRepeatedField(this, 1));
+  return /** @type {!Array.<string>} */ (jspb.Message.getRepeatedField(this, 1));
 };
 
 
-/** @param {!Array.<!proto.iroha.protocol.RolePermission>} value */
+/** @param {!Array.<string>} value */
 proto.iroha.protocol.RolePermissionsResponse.prototype.setPermissionsList = function(value) {
   jspb.Message.setField(this, 1, value || []);
 };
 
 
 /**
- * @param {!proto.iroha.protocol.RolePermission} value
+ * @param {!string} value
  * @param {number=} opt_index
  */
 proto.iroha.protocol.RolePermissionsResponse.prototype.addPermissions = function(value, opt_index) {
@@ -2244,7 +2260,7 @@ proto.iroha.protocol.TransactionsResponse.prototype.toObject = function(opt_incl
 proto.iroha.protocol.TransactionsResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     transactionsList: jspb.Message.toObjectList(msg.getTransactionsList(),
-    transaction_pb.Transaction.toObject, includeInstance)
+    block_pb.Transaction.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -2282,8 +2298,8 @@ proto.iroha.protocol.TransactionsResponse.deserializeBinaryFromReader = function
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new transaction_pb.Transaction;
-      reader.readMessage(value,transaction_pb.Transaction.deserializeBinaryFromReader);
+      var value = new block_pb.Transaction;
+      reader.readMessage(value,block_pb.Transaction.deserializeBinaryFromReader);
       msg.addTransactions(value);
       break;
     default:
@@ -2320,7 +2336,7 @@ proto.iroha.protocol.TransactionsResponse.serializeBinaryToWriter = function(mes
     writer.writeRepeatedMessage(
       1,
       f,
-      transaction_pb.Transaction.serializeBinaryToWriter
+      block_pb.Transaction.serializeBinaryToWriter
     );
   }
 };
@@ -2332,7 +2348,7 @@ proto.iroha.protocol.TransactionsResponse.serializeBinaryToWriter = function(mes
  */
 proto.iroha.protocol.TransactionsResponse.prototype.getTransactionsList = function() {
   return /** @type{!Array.<!proto.iroha.protocol.Transaction>} */ (
-    jspb.Message.getRepeatedWrapperField(this, transaction_pb.Transaction, 1));
+    jspb.Message.getRepeatedWrapperField(this, block_pb.Transaction, 1));
 };
 
 
@@ -3263,7 +3279,7 @@ proto.iroha.protocol.BlockQueryResponse.oneofGroups_ = [[1,2]];
 proto.iroha.protocol.BlockQueryResponse.ResponseCase = {
   RESPONSE_NOT_SET: 0,
   BLOCK_RESPONSE: 1,
-  BLOCK_ERROR_RESPONSE: 2
+  ERROR_RESPONSE: 2
 };
 
 /**
@@ -3303,7 +3319,7 @@ proto.iroha.protocol.BlockQueryResponse.prototype.toObject = function(opt_includ
 proto.iroha.protocol.BlockQueryResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     blockResponse: (f = msg.getBlockResponse()) && proto.iroha.protocol.BlockResponse.toObject(includeInstance, f),
-    blockErrorResponse: (f = msg.getBlockErrorResponse()) && proto.iroha.protocol.BlockErrorResponse.toObject(includeInstance, f)
+    errorResponse: (f = msg.getErrorResponse()) && proto.iroha.protocol.BlockErrorResponse.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3348,7 +3364,7 @@ proto.iroha.protocol.BlockQueryResponse.deserializeBinaryFromReader = function(m
     case 2:
       var value = new proto.iroha.protocol.BlockErrorResponse;
       reader.readMessage(value,proto.iroha.protocol.BlockErrorResponse.deserializeBinaryFromReader);
-      msg.setBlockErrorResponse(value);
+      msg.setErrorResponse(value);
       break;
     default:
       reader.skipField();
@@ -3387,7 +3403,7 @@ proto.iroha.protocol.BlockQueryResponse.serializeBinaryToWriter = function(messa
       proto.iroha.protocol.BlockResponse.serializeBinaryToWriter
     );
   }
-  f = message.getBlockErrorResponse();
+  f = message.getErrorResponse();
   if (f != null) {
     writer.writeMessage(
       2,
@@ -3429,23 +3445,23 @@ proto.iroha.protocol.BlockQueryResponse.prototype.hasBlockResponse = function() 
 
 
 /**
- * optional BlockErrorResponse block_error_response = 2;
+ * optional BlockErrorResponse error_response = 2;
  * @return {?proto.iroha.protocol.BlockErrorResponse}
  */
-proto.iroha.protocol.BlockQueryResponse.prototype.getBlockErrorResponse = function() {
+proto.iroha.protocol.BlockQueryResponse.prototype.getErrorResponse = function() {
   return /** @type{?proto.iroha.protocol.BlockErrorResponse} */ (
     jspb.Message.getWrapperField(this, proto.iroha.protocol.BlockErrorResponse, 2));
 };
 
 
 /** @param {?proto.iroha.protocol.BlockErrorResponse|undefined} value */
-proto.iroha.protocol.BlockQueryResponse.prototype.setBlockErrorResponse = function(value) {
+proto.iroha.protocol.BlockQueryResponse.prototype.setErrorResponse = function(value) {
   jspb.Message.setOneofWrapperField(this, 2, proto.iroha.protocol.BlockQueryResponse.oneofGroups_[0], value);
 };
 
 
-proto.iroha.protocol.BlockQueryResponse.prototype.clearBlockErrorResponse = function() {
-  this.setBlockErrorResponse(undefined);
+proto.iroha.protocol.BlockQueryResponse.prototype.clearErrorResponse = function() {
+  this.setErrorResponse(undefined);
 };
 
 
@@ -3453,7 +3469,7 @@ proto.iroha.protocol.BlockQueryResponse.prototype.clearBlockErrorResponse = func
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.iroha.protocol.BlockQueryResponse.prototype.hasBlockErrorResponse = function() {
+proto.iroha.protocol.BlockQueryResponse.prototype.hasErrorResponse = function() {
   return jspb.Message.getField(this, 2) != null;
 };
 

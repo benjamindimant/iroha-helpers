@@ -2,10 +2,10 @@
 // file: endpoint.proto
 
 import * as endpoint_pb from "./endpoint_pb";
-import * as transaction_pb from "./transaction_pb";
+import * as block_pb from "./block_pb";
 import * as queries_pb from "./queries_pb";
-import * as qry_responses_pb from "./qry_responses_pb";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+import * as responses_pb from "./responses_pb";
 import {grpc} from "grpc-web-client";
 
 type CommandServiceTorii = {
@@ -13,16 +13,7 @@ type CommandServiceTorii = {
   readonly service: typeof CommandService;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof transaction_pb.Transaction;
-  readonly responseType: typeof google_protobuf_empty_pb.Empty;
-};
-
-type CommandServiceListTorii = {
-  readonly methodName: string;
-  readonly service: typeof CommandService;
-  readonly requestStream: false;
-  readonly responseStream: false;
-  readonly requestType: typeof endpoint_pb.TxList;
+  readonly requestType: typeof block_pb.Transaction;
   readonly responseType: typeof google_protobuf_empty_pb.Empty;
 };
 
@@ -47,7 +38,6 @@ type CommandServiceStatusStream = {
 export class CommandService {
   static readonly serviceName: string;
   static readonly Torii: CommandServiceTorii;
-  static readonly ListTorii: CommandServiceListTorii;
   static readonly Status: CommandServiceStatus;
   static readonly StatusStream: CommandServiceStatusStream;
 }
@@ -58,22 +48,12 @@ type QueryServiceFind = {
   readonly requestStream: false;
   readonly responseStream: false;
   readonly requestType: typeof queries_pb.Query;
-  readonly responseType: typeof qry_responses_pb.QueryResponse;
-};
-
-type QueryServiceFetchCommits = {
-  readonly methodName: string;
-  readonly service: typeof QueryService;
-  readonly requestStream: false;
-  readonly responseStream: true;
-  readonly requestType: typeof queries_pb.BlocksQuery;
-  readonly responseType: typeof qry_responses_pb.BlockQueryResponse;
+  readonly responseType: typeof responses_pb.QueryResponse;
 };
 
 export class QueryService {
   static readonly serviceName: string;
   static readonly Find: QueryServiceFind;
-  static readonly FetchCommits: QueryServiceFetchCommits;
 }
 
 export type ServiceError = { message: string, code: number; metadata: grpc.Metadata }
@@ -92,21 +72,12 @@ export class CommandServiceClient {
 
   constructor(serviceHost: string, options?: ServiceClientOptions);
   torii(
-    requestMessage: transaction_pb.Transaction,
+    requestMessage: block_pb.Transaction,
     metadata: grpc.Metadata,
     callback: (error: ServiceError, responseMessage: google_protobuf_empty_pb.Empty|null) => void
   ): void;
   torii(
-    requestMessage: transaction_pb.Transaction,
-    callback: (error: ServiceError, responseMessage: google_protobuf_empty_pb.Empty|null) => void
-  ): void;
-  listTorii(
-    requestMessage: endpoint_pb.TxList,
-    metadata: grpc.Metadata,
-    callback: (error: ServiceError, responseMessage: google_protobuf_empty_pb.Empty|null) => void
-  ): void;
-  listTorii(
-    requestMessage: endpoint_pb.TxList,
+    requestMessage: block_pb.Transaction,
     callback: (error: ServiceError, responseMessage: google_protobuf_empty_pb.Empty|null) => void
   ): void;
   status(
@@ -128,12 +99,11 @@ export class QueryServiceClient {
   find(
     requestMessage: queries_pb.Query,
     metadata: grpc.Metadata,
-    callback: (error: ServiceError, responseMessage: qry_responses_pb.QueryResponse|null) => void
+    callback: (error: ServiceError, responseMessage: responses_pb.QueryResponse|null) => void
   ): void;
   find(
     requestMessage: queries_pb.Query,
-    callback: (error: ServiceError, responseMessage: qry_responses_pb.QueryResponse|null) => void
+    callback: (error: ServiceError, responseMessage: responses_pb.QueryResponse|null) => void
   ): void;
-  fetchCommits(requestMessage: queries_pb.BlocksQuery, metadata?: grpc.Metadata): ResponseStream<qry_responses_pb.BlockQueryResponse>;
 }
 
