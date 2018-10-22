@@ -38,6 +38,9 @@ var txClient = new CommandServiceClient(
   grpc.credentials.createInsecure()
 )
 
+/* Serializing transaction to Bytes */
+const SerializedTransaction = transaction.serializeBinary()
+
 const txHash = txHelper.hash(transaction)
 
 txClient.torii(transaction, (err, data) => {
