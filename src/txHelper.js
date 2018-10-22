@@ -4,9 +4,8 @@ import { sha3_256 as sha3 } from 'js-sha3'
 import cloneDeep from 'lodash.clonedeep'
 import forEach from 'lodash.foreach'
 import * as Commands from './proto/commands_pb'
-import { TxList } from './proto/endpoint_pb'
-import { Signature } from './proto/primitive_pb'
-import Transaction from './proto/transaction_pb'
+import { Signature, Amount, uint256 } from './proto/primitive_pb'
+import Transaction from './proto/block_pb'
 import { capitalize } from './util.js'
 
 const emptyTransaction = () => new Transaction.Transaction()
@@ -27,8 +26,21 @@ const getOrCreatePayload = transaction => transaction.hasPayload() ? cloneDeep(t
 const addCommand = (transaction, commandName, params) => {
   let payloadCommand = new Commands[capitalize(commandName)]()
 
+  let amount
+
+  if (params.amount) {
+      amount = new Amount()
+      let value = new uint256()
+      // FIXME: will only work with JS 64bit numbers :) Maybe we need to utilize setFirst/Second/etc.
+      value.setFourth(params.amount.value)
+      amount.setValue(value)
+      amount.setPrecision(params.amount.precision)
+    }
+
   forEach(params, (value, key) => {
-    payloadCommand['set' + capitalize(key)](value)
+    let valueToSet = value
+    if (key === 'amount') valueToSet = amount
+    payloadCommand['set' + capitalize(key)](valueToSet)
   })
 
   let command = new Commands.Command()
@@ -101,24 +113,11 @@ const sign = (transaction, privateKeyHex) => {
  */
 const hash = transaction => Buffer.from(sha3.array(transaction.getPayload().serializeBinary()))
 
-/**
- * Returns a TransactionList with transactions from array
- * @param {Array} transactions transactions to be included in batch
- * @returns {Object} TxList with all transactions
- */
-const createTxListFromArray = (transactions) => {
-  let txList = new TxList()
-  txList.setTransactionsList(transactions)
-  return txList
-}
-
 // TODO: Add types for commands
 export default {
   addCommand,
   addMeta,
   sign,
   emptyTransaction,
-  hash,
-  addBatchMeta,
-  createTxListFromArray
+  hash
 }

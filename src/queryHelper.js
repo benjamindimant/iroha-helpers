@@ -74,7 +74,7 @@ const sign = (query, privateKeyHex) => {
   const signatory = signQuery(payloadHash, publicKey, privateKey)
 
   let s = new Signature()
-  s.setPublicKey(publicKey)
+  s.setPubkey(publicKey)
   s.setSignature(signatory)
 
   let signedQueryWithSignature = cloneDeep(query)

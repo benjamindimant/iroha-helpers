@@ -1,67 +1,52 @@
 // for usage with grpc package use endpoint_grpc_pb file
+import grpc from 'grpc'
 import {
   QueryServiceClient,
   CommandServiceClient
-} from '../lib/proto/endpoint_pb_service'
+} from '../lib/proto/endpoint_grpc_pb'
 import { queryHelper, txHelper } from '../lib'
-
 import { TxStatus, TxStatusRequest } from '../lib/proto/endpoint_pb.js'
 
 import flow from 'lodash.flow'
 
-let irohaAddress = 'http://localhost:8080'
+let irohaAddress = 'localhost:50051'
 
 let adminPriv =
-  'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70'
+  '0f0ce16d2afbb8eca23c7d8c2724f0c257a800ee2bbd54688cec6b898e3f7e33'
 
 // Creating transaction with txHelper
 let transaction = flow(
   t =>
-    txHelper.addCommand(t, 'CreateAsset', {
-      assetName: 'dollar10',
-      domainId: 'test',
-      precision: 2
-    }),
+  txHelper.addCommand(t, 'AddAssetQuantity', {
+    accountId: 'admin@test',
+    assetId: 'coin#test',
+    amount: {
+      value: '100000',
+      precision: '2'
+    }
+  }),
   t =>
     txHelper.addMeta(t, {
       creatorAccountId: 'admin@test'
-    })
-)(txHelper.emptyTransaction())
-
-let transaction2 = flow(
-  t =>
-    txHelper.addCommand(t, 'CreateAsset', {
-      assetName: 'dollar11',
-      domainId: 'test',
-      precision: 2
     }),
   t =>
-    txHelper.addMeta(t, {
-      creatorAccountId: 'admin@test'
-    })
+    txHelper.sign(t, adminPriv)
 )(txHelper.emptyTransaction())
 
-// for usage with grpc package don't forget to pass credentials or grpc.credentials.createInsecure()
-const txClient = new CommandServiceClient(irohaAddress)
+var txClient = new CommandServiceClient(
+  irohaAddress,
+  grpc.credentials.createInsecure()
+)
 
-const batchArray = txHelper.addBatchMeta([transaction, transaction2], 0)
+const txHash = txHelper.hash(transaction)
 
-batchArray[0] = txHelper.sign(batchArray[0], adminPriv)
-batchArray[1] = txHelper.sign(batchArray[1], adminPriv)
-
-const txHash = txHelper.hash(batchArray[0])
-const txHash2 = txHelper.hash(batchArray[1])
-
-const batch = txHelper.createTxListFromArray(batchArray)
-
-txClient.listTorii(batch, (err, data) => {
+txClient.torii(transaction, (err, data) => {
   if (err) {
     throw err
   } else {
     console.log(
       'Submitted transaction successfully! Hash: ' +
-        txHash.toString('hex') + '\n' +
-        txHash2.toString('hex')
+        txHash.toString('hex') + '\n'
     )
   }
 })
@@ -77,40 +62,92 @@ stream.on('data', function (response) {
 })
 
 stream.on('end', function (end) {
-  console.log('finish')
-})
+  console.log('transaction status stream finished')
+  console.log('Sending transfer transaction')
 
-const request2 = new TxStatusRequest()
+  let transferTransaction = flow(
+    t =>
+      txHelper.addCommand(t, 'transferAsset', {
+        srcAccountId: 'admin@test',
+        destAccountId: 'test@test',
+        assetId: 'coin#test',
+        amount: {
+          value: '500',
+          precision: '2'
+        },
+        description: 'Welcome'
+      }),
+    t =>
+      txHelper.addMeta(t, {
+        creatorAccountId: 'admin@test'
+      }),
+    t =>
+      txHelper.sign(t, adminPriv)
+  )(txHelper.emptyTransaction())
 
-request2.setTxHash(txHash2)
+  const transferTxHash = txHelper.hash(transferTransaction)
 
-let stream2 = txClient.statusStream(request2)
+  txClient.torii(transferTransaction, (err, data) => {
+    if (err) {
+      throw err
+    } else {
+      console.log(
+        'Submitted transfer transaction successfully! Hash: ' +
+          txHash.toString('hex') + '\n'
+      )
+    }
+  })
 
-stream2.on('data', function (response) {
-  console.log(response.getTxStatus())
-})
+  const request = new TxStatusRequest()
 
-stream2.on('end', function (end) {
-  console.log('finish')
-})
+  request.setTxHash(txHash)
 
-// Creating query with queryHelper
-let query = flow(
-  (q) => queryHelper.addQuery(q, 'getAccount', { accountId: 'admin@test' }),
-  (q) => queryHelper.addMeta(q, { creatorAccountId: 'admin@test' }),
-  (q) => queryHelper.sign(q, adminPriv)
-)(queryHelper.emptyQuery())
+  let stream = txClient.statusStream(request)
 
-// for usage with grpc package don't forget to pass credentials or grpc.credentials.createInsecure()
-const queryClient = new QueryServiceClient(
-  irohaAddress
-)
+  stream.on('data', function (response) {
+    console.log(response.getTxStatus())
+  })
 
-// Sending query with queryHelper
-queryClient.find(query, (err, response) => {
-  if (err) {
-    throw err
-  } else {
-    console.log(JSON.stringify(response))
-  }
+  stream.on('end', function (response) {
+    console.log('Transfer successful!')
+
+
+    // Creating query with queryHelper
+    let query = flow(
+      (q) => queryHelper.addQuery(q, 'getAccountAssets', { accountId: 'admin@test' }),
+      (q) => queryHelper.addMeta(q, { creatorAccountId: 'admin@test' }),
+      (q) => queryHelper.sign(q, adminPriv)
+    )(queryHelper.emptyQuery())
+
+    // Creating query with queryHelper
+    let query2 = flow(
+      (q) => queryHelper.addQuery(q, 'getAccountAssets', { accountId: 'test@test' }),
+      (q) => queryHelper.addMeta(q, { creatorAccountId: 'admin@test' }),
+      (q) => queryHelper.sign(q, adminPriv)
+    )(queryHelper.emptyQuery())
+
+    // for usage with grpc package don't forget to pass credentials or grpc.credentials.createInsecure()
+    const queryClient = new QueryServiceClient(
+      irohaAddress,
+      grpc.credentials.createInsecure()
+    )
+
+    // Sending query with queryHelper
+    queryClient.find(query, (err, response) => {
+      if (err) {
+        throw err
+      } else {
+        console.log(JSON.stringify(response))
+      }
+    })
+
+     // Sending query with queryHelper
+     queryClient.find(query2, (err, response) => {
+      if (err) {
+        throw err
+      } else {
+        console.log(JSON.stringify(response))
+      }
+    })
+  })
 })
