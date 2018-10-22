@@ -17,12 +17,6 @@ const emptyTransaction = () => new Transaction.Transaction()
  */
 const getOrCreatePayload = transaction => transaction.hasPayload() ? cloneDeep(transaction.getPayload()) : new Transaction.Transaction.Payload()
 
-/**
- * Returns reducedPayload from the payload or a new one
- * @param {Object} payload
- */
-const getOrCreateReducedPayload = payload => payload.hasReducedPayload() ? cloneDeep(payload.getReducedPayload()) : new Transaction.Transaction.Payload.ReducedPayload()
-
 // TODO: Create corner cases for AddPeer, setPermission
 /**
  * Returns new query with added command.
@@ -40,14 +34,14 @@ const addCommand = (transaction, commandName, params) => {
   let command = new Commands.Command()
 
   let commandNameSetter = 'set' + capitalize(commandName)
+   // Fix for setAccountQuorum
+  if (commandNameSetter === 'setSetAccountQuorum') commandNameSetter = 'setSetQuorum'
 
   command[commandNameSetter](payloadCommand)
 
   let payload = getOrCreatePayload(transaction)
-  let reducedPayload = getOrCreateReducedPayload(payload)
 
-  reducedPayload.addCommands(command, reducedPayload.getCommandsList.length)
-  payload.setReducedPayload(reducedPayload)
+  payload.addCommands(command, payload.getCommandsList.length)
 
   let txWithCommand = cloneDeep(transaction)
   txWithCommand.setPayload(payload)
@@ -65,13 +59,10 @@ const addCommand = (transaction, commandName, params) => {
  */
 const addMeta = (transaction, { creatorAccountId, createdTime = Date.now(), quorum = 1 }) => {
   let payload = getOrCreatePayload(transaction)
-  let reducedPayload = getOrCreateReducedPayload(payload)
 
-  reducedPayload.setCreatorAccountId(creatorAccountId)
-  reducedPayload.setCreatedTime(createdTime)
-  reducedPayload.setQuorum(quorum)
-
-  payload.setReducedPayload(reducedPayload)
+  payload.setCreatorAccountId(creatorAccountId)
+  payload.setCreatedTime(createdTime)
+  payload.setQuorum(quorum)
 
   let transactionWithMeta = cloneDeep(transaction)
   transactionWithMeta.setPayload(payload)
@@ -93,7 +84,7 @@ const sign = (transaction, privateKeyHex) => {
   const signatory = signTransaction(payloadHash, publicKey, privateKey)
 
   let s = new Signature()
-  s.setPublicKey(publicKey)
+  s.setPubkey(publicKey)
   s.setSignature(signatory)
 
   let signedTransactionWithSignature = cloneDeep(transaction)
@@ -109,32 +100,6 @@ const sign = (transaction, privateKeyHex) => {
  * @returns {Buffer} transaction hash
  */
 const hash = transaction => Buffer.from(sha3.array(transaction.getPayload().serializeBinary()))
-
-/**
- * Returns array of transactions with Batch Meta in them
- * @param {Array} transactions transactions to be included in batch
- * @param {Number} type type of batch transaction, 0 for ATOMIC, 1 for ORDERED
- * @returns {Array} Transactions with all necessary fields
- */
-const addBatchMeta = (transactions, type) => {
-  let reducedHashes = transactions.map(tx => Buffer.from(sha3.array(tx.getPayload().getReducedPayload().serializeBinary())))
-
-  let batchMeta = new Transaction.Transaction.Payload.BatchMeta()
-  batchMeta.setReducedHashesList(reducedHashes)
-  batchMeta.setType(type)
-
-  let transactionsWithBatchMeta = transactions.map(tx => {
-    let transaction = cloneDeep(tx)
-    let payload = getOrCreatePayload(transaction)
-
-    payload.setBatch(batchMeta)
-    transaction.setPayload(payload)
-
-    return transaction
-  })
-
-  return transactionsWithBatchMeta
-}
 
 /**
  * Returns a TransactionList with transactions from array
