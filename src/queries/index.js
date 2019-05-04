@@ -1,5 +1,5 @@
 
-import flow from 'lodash.flow'
+import flow from 'lodash/fp/flow'
 import queryHelper from '../queryHelper'
 import * as pbResponse from '../proto/qry_responses_pb'
 import { getProtoEnumName } from '../util'
@@ -88,35 +88,6 @@ function getAccount (queryOptions, { accountId }) {
       }
 
       const account = response.getAccountResponse().getAccount().toObject()
-      resolve(account)
-    }
-  )
-}
-
-/**
- * getRawAccount
- * @param {Object} queryOptions
- * @param {Object} args
- * @property {String} args.accountId
- * @link https://iroha.readthedocs.io/en/latest/api/queries.html#get-account
- */
-function getRawAccount (queryOptions, { accountId }) {
-  return sendQuery(
-    queryOptions,
-    queryHelper.addQuery(
-      queryHelper.emptyQuery(),
-      'getAccount',
-      {
-        accountId
-      }
-    ),
-    (resolve, reject, responseName, response) => {
-      if (responseName !== 'ACCOUNT_RESPONSE') {
-        const error = JSON.stringify(response.toObject().errorResponse)
-        return reject(new Error(`Query response error: expected=ACCOUNT_RESPONSE, actual=${responseName}\nReason: ${error}`))
-      }
-
-      const account = response.getAccountResponse()
       resolve(account)
     }
   )
@@ -468,7 +439,7 @@ function getBlock (queryOptions, { height }) {
         return reject(new Error(`Query response error: expected=BLOCK_RESPONSE, actual=${responseName}\nReason: ${error}`))
       }
 
-      const block = response.getBlockResponse().toObject().block.blockV1
+      const block = response.getBlockResponse()
       resolve(block)
     }
   )
@@ -476,7 +447,6 @@ function getBlock (queryOptions, { height }) {
 
 export default {
   getAccount,
-  getRawAccount,
   getSignatories,
   getTransactions,
   getPendingTransactions,
